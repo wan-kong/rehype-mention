@@ -21,13 +21,9 @@ npm install rehype-mention
 
 ## Use
 
-Say our document `example.html` contains:
+### Basic HTML Processing
 
-```html
-<p>这是一个@[张三](xiaoming)测试。</p>
-```
-
-…and our module `example.js` contains:
+Say our module contains:
 
 ```js
 import rehypeParse from 'rehype-parse'
@@ -44,10 +40,33 @@ const file = await unified()
 console.log(String(file))
 ```
 
-…then running `node example.js` will output:
+…then running the code will output:
 
 ```html
 <p>这是一个<span data-type="mention" data-id="xiaoming">@张三</span>测试。</p>
+```
+
+### Markdown Integration
+
+**⚠️ Important:** In Markdown environments, `@[text](id)` patterns will be converted to links by Markdown parsers. This plugin handles both scenarios:
+
+```js
+import remarkParse from 'remark-parse'
+import remarkRehype from 'remark-rehype'
+import rehypeStringify from 'rehype-stringify'
+import {unified} from 'unified'
+import rehypeMention from 'rehype-mention'
+
+// Process Markdown with mentions
+const result = await unified()
+  .use(remarkParse)          // Parse Markdown
+  .use(remarkRehype)         // Convert to HTML AST
+  .use(rehypeMention)        // Handle mentions (works after link conversion)
+  .use(rehypeStringify)      // Output HTML
+  .process('User @[张三](user-123) sent a message.')
+
+console.log(String(result))
+// Output: <p>User <span data-type="mention" data-id="user-123">@张三</span> sent a message.</p>
 ```
 
 ## API
@@ -59,17 +78,25 @@ The default export is `rehypeMention`.
 
 Transform mention text patterns into HTML elements.
 
-The plugin searches for text patterns in the format:
+The plugin searches for text patterns in two formats:
 
-```text
-@[displayText](uuid)
-```
+1. **Text format:** `@[displayText](uuid)`
+2. **Link format:** `@<a href="uuid">displayText</a>` (from Markdown conversion)
 
-And transforms them into:
+Both are transformed into:
 
 ```html
 <span data-type="mention" data-id="uuid">@displayText</span>
 ```
+
+#### Processing Order
+
+This plugin is designed to work **after** Markdown processing. The recommended order is:
+
+1. `remarkParse` (if using Markdown)
+2. `remarkRehype` (if using Markdown)
+3. **`rehypeMention`** ← Insert here
+4. `rehypeStringify`
 
 #### Parameters
 
@@ -94,7 +121,7 @@ Where:
 
 ## Examples
 
-### Basic mention
+### Basic mention (Text format)
 
 ```html
 <!-- Input -->
@@ -114,14 +141,24 @@ Where:
 <p>Meeting with <span data-type="mention" data-id="user-1">@张三</span> and <span data-type="mention" data-id="user-2">@李四</span></p>
 ```
 
-### Complex display text
+### Markdown-converted mentions (Link format)
+
+```html
+<!-- Input (after Markdown processing) -->
+<p>User @<a href="user-123">张三</a> sent a message.</p>
+
+<!-- Output -->
+<p>User <span data-type="mention" data-id="user-123">@张三</span> sent a message.</p>
+```
+
+### Mixed scenario
 
 ```html
 <!-- Input -->
-<p>Server @[user](123123) is online.</p>
+<p>@[源地址](f14e1cf3)和@<a href="user-123">张三</a>都在线。</p>
 
 <!-- Output -->
-<p>Server <span data-type="mention" data-id="123123">@user</span> is online.</p>
+<p><span data-type="mention" data-id="f14e1cf3">@源地址</span>和<span data-type="mention" data-id="user-123">@张三</span>都在线。</p>
 ```
 
 ## Compatibility

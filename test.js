@@ -28,6 +28,31 @@ const testCases = [
         name: '包含特殊字符的mention',
         input: '<p>系统@[服务器-01：10.0.0.1](srv-a1b2c3d4-e5f6-7890-abcd-ef1234567890)状态正常。</p>',
         expected: '<p>系统<span data-type="mention" data-id="srv-a1b2c3d4-e5f6-7890-abcd-ef1234567890">@服务器-01：10.0.0.1</span>状态正常。</p>'
+    },
+    {
+        name: '处理Markdown转换的链接（单个mention）',
+        input: '<p>用户@<a href="user-123">张三</a>在线。</p>',
+        expected: '<p>用户<span data-type="mention" data-id="user-123">@张三</span>在线。</p>'
+    },
+    {
+        name: '处理Markdown转换的链接（多个mention）',
+        input: '<p>@<a href="user-123">张三</a>和@<a href="user-456">李四</a>在讨论。</p>',
+        expected: '<p><span data-type="mention" data-id="user-123">@张三</span>和<span data-type="mention" data-id="user-456">@李四</span>在讨论。</p>'
+    },
+    {
+        name: '混合场景：文本mention和链接mention',
+        input: '<p>@[源地址](f14e1cf3)和@<a href="user-123">张三</a>都在线。</p>',
+        expected: '<p><span data-type="mention" data-id="f14e1cf3">@源地址</span>和<span data-type="mention" data-id="user-123">@张三</span>都在线。</p>'
+    },
+    {
+        name: '普通链接不应被转换',
+        input: '<p>请访问<a href="https://example.com">这个网站</a>了解更多。</p>',
+        expected: '<p>请访问<a href="https://example.com">这个网站</a>了解更多。</p>'
+    },
+    {
+        name: '@ 后面的普通链接',
+        input: '<p>邮箱格式：@<a href="mailto:test@example.com">test@example.com</a></p>',
+        expected: '<p>邮箱格式：<span data-type="mention" data-id="mailto:test@example.com">@test@example.com</span></p>'
     }
 ]
 
