@@ -1,0 +1,47 @@
+{
+  "name": "rehype-mention",
+  "version": "1.0.0",
+  "description": "A rehype plugin to transform mention text patterns into HTML elements",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node test.js",
+    "example": "node example.js"
+  },
+  "keywords": [
+    "rehype",
+    "mention",
+    "plugin",
+    "html",
+    "transform",
+    "markdown",
+    "unified",
+    "hast"
+  ],
+  "author": "wan-kong",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wan-kong/rehype-mention.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wan-kong/rehype-mention/issues"
+  },
+  "homepage": "https://github.com/wan-kong/rehype-mention#readme",
+  "files": [
+    "index.js",
+    "README.md",
+    "package.json"
+  ],
+  "dependencies": {
+    "unist-util-visit": "^5.0.0"
+  },
+  "devDependencies": {
+    "rehype-parse": "^9.0.0",
+    "rehype-stringify": "^10.0.0",
+    "unified": "^11.0.0"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}
